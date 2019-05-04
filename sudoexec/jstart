@@ -611,6 +611,14 @@ set -e
 makejconf jname=${jname} out=${ftmpdir}/${jname}.conf ip6wa=${HAVE_IPV6} epair=${epairb_list} fbsd=${is_freebsd}
 set +e
 
+${ECHO} "${BOLD}Notice: ${N1_COLOR}ip4/6.addr configured${N1_COLOR}.${N0_COLOR}"
+grep ip ${ftmpdir}/${jname}.conf
+gsed -i 's/ip4.addr.*/ip4="inherit";/' ${ftmpdir}/${jname}.conf
+gsed -i 's/ip6.addr.*/ip6="inherit";/' ${ftmpdir}/${jname}.conf
+vim -esu NONE +'g/\v^(.+)$\_.{-}^\1$/d' +wq ${ftmpdir}/${jname}.conf
+${ECHO} "${BOLD}Notice: ${N1_COLOR}ip4/6.addr cleared${N1_COLOR}.${N0_COLOR}"
+grep ip ${ftmpdir}/${jname}.conf
+
 #rctl/limits area
 jrctl jname=$jname mode=set
 #. ${distdir}/rctl.subr
@@ -703,7 +711,6 @@ external_exec_script -s start.d
 get_jid
 jid=${myjid}
 external_exec_master_script "master_poststart.d"
-
 
 if [ ${myjid} -gt 0 ]; then
 	status="1"
